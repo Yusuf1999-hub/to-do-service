@@ -6,6 +6,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"github.com/jmoiron/sqlx"
 
 	pb "github.com/Yusuf1999-hub/to-do-service/genproto"
 	l "github.com/Yusuf1999-hub/to-do-service/pkg/logger"

@@ -6,7 +6,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/Yusuf1999-hub/to-do-service/storage"
 	"github.com/Yusuf1999-hub/to-do-service/config"
 	pb "github.com/Yusuf1999-hub/to-do-service/genproto"
 	"github.com/Yusuf1999-hub/to-do-service/pkg/db"
