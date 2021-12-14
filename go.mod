@@ -1,4 +1,4 @@
-module github.com/Yusuf1999-hub/template-service
+module github.com/Yusuf1999-hub/to-do-service
 
 go 1.17
 
