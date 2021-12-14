@@ -1,7 +1,7 @@
 .PHONY: build
 
 CURRENT_DIR=$(shell pwd)
-APP=template
+APP=ToDo
 APP_CMD_DIR=./cmd
 
 build:

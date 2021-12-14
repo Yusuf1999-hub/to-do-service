@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/Yusuf1999-hub/template-service/storage"
 	"github.com/Yusuf1999-hub/to-do-service/config"
 	pb "github.com/Yusuf1999-hub/to-do-service/genproto"
 	"github.com/Yusuf1999-hub/to-do-service/pkg/db"
@@ -35,7 +36,9 @@ func main() {
 	}
 	defer connDB.Close()
 
-	taskService := service.NewTaskService(connDB, log)
+	pgStorage := storage.NewStoragePg(connDB)
+
+	taskService := service.NewTaskService(pgStorage, log)
 
 	lis, err := net.Listen("tcp", cfg.RPCPort)
 	if err != nil {
