@@ -56,7 +56,7 @@ func (r *taskRepo) Get(id int64) (pb.Task, error) {
 func (r *taskRepo) List(page, limit int64) ([]*pb.Task, int64, error) {
 	var tasks []*pb.Task
 	offset := (page - 1) * limit
-	err := r.db.SELECT(&tasks`
+	err := r.db.SELECT(&tasks,`
 				SELECT id, assignee, title, summary, deadline, status 
 				FROM tasks LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
@@ -116,7 +116,7 @@ func (r *taskRepo) Delete(id int64) error {
 
 func (r *taskRepo) ListOverdue(time time.Time) ([]*pb.Task, error) {
 	var tasks []*pb.Task
-	err := r.db.SELECT(&tasks`
+	err := r.db.SELECT(&tasks,`
 				SELECT id, assignee, title, summary, deadline, status 
 				FROM tasks WHERE deadline >= $1`, time)
 	if err != nil {
