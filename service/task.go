@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/jmoiron/sqlx"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -20,9 +19,9 @@ type TaskService struct {
 }
 
 // NewTaskService ...
-func NewTaskService(db *sqlx.DB, log l.Logger) *TaskService {
+func NewTaskService(storage storage.IStorage, log l.Logger) *TaskService {
 	return &TaskService{
-		storage: storage.NewStoragePg(db),
+		storage: storage,
 		logger:  log,
 	}
 }
