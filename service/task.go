@@ -80,7 +80,7 @@ func (s *TaskService) Delete(ctx context.Context, req *pb.ByIdReq) (*pb.EmptyRes
 }
 
 func (s *TaskService) ListOverdue(ctx context.Context, timer *pb.CheckTime) (*pb.ListOver, error) {
-	t, err := time.Parse("2020-01-01", timer.Time)
+	t, err := time.Parse("2006-Jan-02", timer.Time)
 	if err != nil {
 		s.logger.Error("failed to delete task", l.Error(err))
 	}

@@ -84,7 +84,6 @@ func (r *taskRepo) Update(task pb.Task) (pb.Task, error) {
 		&task.Deadline,
 		&task.Status,
 		&task.Id)
-
 	if err != nil {
 		return pb.Task{}, err
 	}
