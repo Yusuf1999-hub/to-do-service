@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS tasks(
     assignee VARCHAR(20) NOT NULL,
     title TEXT NOT NULL,
     summary TEXT NOT NULL,
-    deadline DATE NOT NULL DEFAULT CURRENT_DATE,
+    deadline DATE DEFAULT CURRENT_DATE,
     status TEXT DEFAULT 'active'
 );
 
