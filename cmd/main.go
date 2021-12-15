@@ -6,12 +6,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/Yusuf1999-hub/template-service/storage"
 	"github.com/Yusuf1999-hub/to-do-service/config"
 	pb "github.com/Yusuf1999-hub/to-do-service/genproto"
 	"github.com/Yusuf1999-hub/to-do-service/pkg/db"
 	"github.com/Yusuf1999-hub/to-do-service/pkg/logger"
 	"github.com/Yusuf1999-hub/to-do-service/service"
+	"github.com/Yusuf1999-hub/to-do/storage"
 )
 
 func main() {
