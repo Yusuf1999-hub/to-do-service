@@ -16,7 +16,6 @@ func TestMain(m *testing.M) {
 	cfg := config.Load()
 
 	connDB, err := db.ConnectToDB(cfg)
-
 	if err != nil {
 		log.Fatal("sqlx connection to postgres error", logger.Error(err))
 	}

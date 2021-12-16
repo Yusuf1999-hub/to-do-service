@@ -8,7 +8,7 @@ service TaskService {
     rpc List(ListReq) returns (ListResp);
     rpc Update(Task) returns (Task);
     rpc Delete(ByIdReq) returns (EmptyResp);
-    rpc ListOverdue(CheckTime) returns (ListOver);
+    rpc ListOverdue(ListOverReq) returns (ListOverResp);
 }
 
 message EmptyResp {}
@@ -36,10 +36,13 @@ message ListResp {
     int64 count = 2;
 }
 
-message ListOver {
+message ListOverResp {
     repeated Task tasks = 1;
+    int64 count = 2;
 }
 
-message CheckTime {
-    string time = 1;
+message ListOverReq {
+    int64 page = 1;
+    int64 limit = 2;
+    string time = 3;
 }

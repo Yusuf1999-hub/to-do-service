@@ -6,4 +6,3 @@ CREATE TABLE IF NOT EXISTS tasks(
     deadline DATE DEFAULT CURRENT_DATE,
     status TEXT DEFAULT 'active'
 );
-
