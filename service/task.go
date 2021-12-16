@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -80,12 +79,12 @@ func (s *TaskService) Delete(ctx context.Context, req *pb.ByIdReq) (*pb.EmptyRes
 }
 
 func (s *TaskService) ListOverdue(ctx context.Context, req *pb.ListOverReq) (*pb.ListOverResp, error) {
-	t, err := time.Parse("2006-Jan-02", req.Time)
-	if err != nil {
-		s.logger.Error("failed to delete task", l.Error(err))
-	}
+	//t, err := time.Parse("2006-06-02", req.Time)
+	//if err != nil {
+	//	s.logger.Error("failed to delete task", l.Error(err))
+	//}
 
-	tasks, count, err := s.storage.Task().ListOverdue(req.Page, req.Limit, t)
+	tasks, count, err := s.storage.Task().ListOverdue(req.Page, req.Limit, req.Time)
 	if err != nil {
 		s.logger.Error("failed to list tasks", l.Error(err))
 		return nil, status.Error(codes.Internal, "failed to list tasks")

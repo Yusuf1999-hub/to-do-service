@@ -21,13 +21,14 @@ func NewTaskRepo(db *sqlx.DB) *taskRepo {
 func (r *taskRepo) Create(task pb.Task) (pb.Task, error) {
 	var id int64
 	err := r.db.QueryRow(`
-		INSERT INTO tasks(assignee, title, summary, deadline, status)
-		VALUES($1, $2, $3, $4, $5) returning id`,
+		INSERT INTO tasks(assignee, title, summary, deadline, status, created_at)
+		VALUES($1, $2, $3, $4, $5, $6) returning id`,
 		task.Assignee,
 		task.Title,
 		task.Summary,
 		task.Deadline,
 		task.Status,
+		time.Now(),
 	).Scan(&id)
 	if err != nil {
 		return pb.Task{}, err
@@ -45,7 +46,7 @@ func (r *taskRepo) Get(id int64) (pb.Task, error) {
 	var task pb.Task
 	err := r.db.Get(&task, `
 		SELECT id, assignee, title, summary, deadline, status FROM tasks
-		WHERE id=$1`, id)
+		WHERE id=$1 AND deleted_at IS NULL ORDER BY id ASC`, id)
 	if err != nil {
 		return pb.Task{}, err
 	}
@@ -62,7 +63,7 @@ func (r *taskRepo) List(page, limit int64) ([]*pb.Task, int64, error) {
 	offset := (page - 1) * limit
 	err := r.db.Select(&tasks, `
 				SELECT id, assignee, title, summary, deadline, status 
-				FROM tasks LIMIT $1 OFFSET $2`, limit, offset)
+				FROM tasks WHERE deleted_at IS NULL ORDER BY id ASC LIMIT $1 OFFSET $2 `, limit, offset)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -77,13 +78,14 @@ func (r *taskRepo) List(page, limit int64) ([]*pb.Task, int64, error) {
 }
 
 func (r *taskRepo) Update(task pb.Task) (pb.Task, error) {
-	result, err := r.db.Exec(`UPDATE tasks SET assignee=$1, title=$2, summary=$3, deadline=$4, status=$5 
-						WHERE id=$6`,
+	result, err := r.db.Exec(`UPDATE tasks SET assignee=$1, title=$2, summary=$3, deadline=$4, status=$5, updated_at = $6 
+						WHERE id=$7`,
 		&task.Assignee,
 		&task.Title,
 		&task.Summary,
 		&task.Deadline,
 		&task.Status,
+		time.Now(),
 		&task.Id)
 	if err != nil {
 		return pb.Task{}, err
@@ -102,7 +104,9 @@ func (r *taskRepo) Update(task pb.Task) (pb.Task, error) {
 }
 
 func (r *taskRepo) Delete(id int64) error {
-	result, err := r.db.Exec(`DELETE FROM tasks WHERE id=$1`, id)
+	currentTime := time.Now()
+
+	result, err := r.db.Exec(`UPDATE tasks SET deleted_at = $1  WHERE id=$2`, currentTime, id)
 	if err != nil {
 		return err
 	}
@@ -114,7 +118,7 @@ func (r *taskRepo) Delete(id int64) error {
 	return nil
 }
 
-func (r *taskRepo) ListOverdue(page, limit int64, time time.Time) ([]*pb.Task, int64, error) {
+func (r *taskRepo) ListOverdue(page, limit int64, timer string) ([]*pb.Task, int64, error) {
 	var (
 		count int64
 		tasks []*pb.Task
@@ -122,13 +126,13 @@ func (r *taskRepo) ListOverdue(page, limit int64, time time.Time) ([]*pb.Task, i
 	offset := (page - 1) * limit
 
 	err := r.db.Select(&tasks, `
-				SELECT id, assignee, title, summary, deadline, status 
-				FROM tasks WHERE deadline >= $1 LIMIT $2 OFFSET $3`, time, limit, offset)
+				SELECT id, assignee, title, summary, deadline, status
+				FROM tasks WHERE deadline < $1 AND deleted_at IS NULL ORDER BY id ASC LIMIT $2 OFFSET $3`, timer, limit, offset)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	err = r.db.QueryRow(`SELECT count(*) FROM tasks WHERE deadline >= $1`, time).Scan(&count)
+	err = r.db.QueryRow(`SELECT count(*) FROM tasks WHERE deadline < $1 AND deleted_at IS NULL`, timer).Scan(&count)
 	if err != nil {
 		return nil, 0, err
 	}

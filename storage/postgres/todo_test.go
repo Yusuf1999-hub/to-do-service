@@ -17,17 +17,17 @@ func TestTaskRepo_Create(t *testing.T) {
 		{
 			name: "omadli",
 			input: pb.Task{
-				Assignee: "Uzbekistan",
-				Title:    "History of Tashkent",
+				Assignee: "salom",
+				Title:    "salom of Tashkent",
 				Summary:  "The book is very good",
-				Deadline: "2020-12-13",
+				Deadline: "2020-11-13",
 				Status:   "active",
 			},
 			want: pb.Task{
-				Assignee: "Uzbekistan",
-				Title:    "History of Tashkent",
+				Assignee: "salom",
+				Title:    "salom of Tashkent",
 				Summary:  "The book is very good",
-				Deadline: "2020-12-13T00:00:00Z",
+				Deadline: "2020-11-13T00:00:00Z",
 				Status:   "active",
 			},
 		},
@@ -37,14 +37,14 @@ func TestTaskRepo_Create(t *testing.T) {
 				Assignee: "Russia",
 				Title:    "History of Russia",
 				Summary:  "The book is good",
-				Deadline: "2020-12-13",
+				Deadline: "2020-11-13",
 				Status:   "active",
 			},
 			want: pb.Task{
 				Assignee: "Russia",
 				Title:    "History of Russia",
 				Summary:  "The book is good",
-				Deadline: "2020-12-13T00:00:00Z",
+				Deadline: "2020-11-13T00:00:00Z",
 				Status:   "active",
 			},
 		},
@@ -73,23 +73,23 @@ func TestTaskRepo_Get(t *testing.T) {
 	}{
 		{
 			name: "successful",
-			id:   21,
+			id:   4,
 			want: pb.Task{
 				Assignee: "Russia",
 				Title:    "History of Russia",
 				Summary:  "The book is good",
-				Deadline: "2020-12-13T00:00:00Z",
+				Deadline: "2020-11-13T00:00:00Z",
 				Status:   "active",
 			},
 		},
 		{
 			name: "additional",
-			id:   22,
+			id:   3,
 			want: pb.Task{
-				Assignee: "Uzbekistan",
-				Title:    "History of Tashkent",
+				Assignee: "salom",
+				Title:    "salom of Tashkent",
 				Summary:  "The book is very good",
-				Deadline: "2020-12-13T00:00:00Z",
+				Deadline: "2020-11-13T00:00:00Z",
 				Status:   "active",
 			},
 		},
@@ -125,28 +125,28 @@ func TestTaskRepo_List(t *testing.T) {
 	}{
 		{
 			name:  "successful",
-			page:  11,
+			page:  1,
 			limit: 2,
 			want: result{
 				list: []pb.Task{
 					{
-						Id:       21,
-						Assignee: "Russia",
-						Title:    "History of Russia",
+						Id:       3,
+						Assignee: "Belgium",
+						Title:    "History of Moscow",
 						Summary:  "The book is good",
-						Deadline: "2020-12-13T00:00:00Z",
+						Deadline: "2021-12-13T00:00:00Z",
 						Status:   "active",
 					},
 					{
-						Id:       22,
-						Assignee: "Uzbekistan",
-						Title:    "History of Tashkent",
-						Summary:  "The book is very good",
-						Deadline: "2020-12-13T00:00:00Z",
+						Id:       4,
+						Assignee: "Russia",
+						Title:    "History of Russia",
+						Summary:  "The book is good",
+						Deadline: "2020-11-13T00:00:00Z",
 						Status:   "active",
 					},
 				},
-				count: 24,
+				count: 4,
 			},
 		},
 	}
@@ -157,10 +157,10 @@ func TestTaskRepo_List(t *testing.T) {
 			if err != nil {
 				log.Fatalf("%s: got:%v", tc.name, err)
 			}
-			if tc.want.count == int64(count) {
+			if tc.want.count == count {
 				for i, j := range tc.want.list {
 					if j.Assignee != got[i].Assignee || j.Title != got[i].Title || j.Summary != got[i].Summary || j.Deadline != got[i].Deadline || j.Status != got[i].Status {
-						log.Fatalf("%s: expected:%v got:%v", tc.name, tc.want, got)
+						log.Fatalf("%s: expected:%v got:%v", tc.name, tc.want.list, got)
 					}
 				}
 			} else {
@@ -170,10 +170,107 @@ func TestTaskRepo_List(t *testing.T) {
 	}
 }
 
-/*
 func TestTaskRepo_Delete(t *testing.T) {
 	tests := []struct {
-		id int64,
+		name string
+		id   int64
+	}{
+		{
+			name: "birinchi",
+			id:   1,
+		},
+		{
+			name: "ikkinchi",
+			id:   2,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := pgRepo.Delete(tc.id)
+			if err != nil {
+				log.Fatalf("%s: got:%v", tc.name, err)
+			}
+		})
 	}
 }
-*/
+
+func TestTaskRepo_Update(t *testing.T) {
+	tests := []struct {
+		name  string
+		input pb.Task
+	}{
+		{
+			name: "hullas",
+			input: pb.Task{
+				Id:       3,
+				Assignee: "Belgium",
+				Title:    "History of Moscow",
+				Summary:  "The book is good",
+				Deadline: "2021-12-13T00:00:00Z",
+				Status:   "active",
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := pgRepo.Update(tc.input)
+			if err != nil {
+				log.Fatalf("%s: got:%v", tc.name, err)
+			}
+
+			if !reflect.DeepEqual(got, tc.input) {
+				log.Fatalf("%s: excepted: %v got: %v", tc.name, tc.input, got)
+			}
+		})
+	}
+}
+
+func TestTaskRepo_ListOverdue(t *testing.T) {
+	tests := []struct {
+		name  string
+		page  int64
+		limit int64
+		time  string
+		want  result
+	}{
+		{
+			name:  "succcess",
+			page:  1,
+			limit: 1,
+			time:  "2020-12-13",
+			want: result{
+				list: []pb.Task{
+					{
+						Id:       4,
+						Assignee: "Russia",
+						Title:    "History of Russia",
+						Summary:  "The book is good",
+						Deadline: "2020-11-13T00:00:00Z",
+						Status:   "active",
+					},
+				},
+				count: 1,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, count, err := pgRepo.ListOverdue(tc.page, tc.limit, tc.time)
+			if err != nil {
+				log.Fatalf("%s: got:%v", tc.name, err)
+			}
+			if count == tc.want.count {
+				for i, j := range tc.want.list {
+					if j.Assignee != got[i].Assignee || j.Title != got[i].Title || j.Summary != got[i].Summary || j.Deadline != got[i].Deadline || j.Status != got[i].Status {
+						log.Fatalf("%s: expected:%v got:%v", tc.name, tc.want.list, got)
+					}
+				}
+			} else {
+				log.Fatalf("%s: expected: %d got: %d", tc.name, tc.want.count, count)
+			}
+		})
+	}
+}
