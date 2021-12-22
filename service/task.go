@@ -2,9 +2,12 @@ package service
 
 import (
 	"context"
-
+	"fmt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"time"
+
+	"github.com/gofrs/uuid"
 
 	pb "github.com/Yusuf1999-hub/to-do-service/genproto"
 	l "github.com/Yusuf1999-hub/to-do-service/pkg/logger"
@@ -26,6 +29,14 @@ func NewTaskService(storage storage.IStorage, log l.Logger) *TaskService {
 }
 
 func (s *TaskService) Create(ctx context.Context, req *pb.Task) (*pb.Task, error) {
+	id, err := uuid.NewV4()
+	fmt.Println(id)
+	if err != nil {
+		s.logger.Error("failed while generating uuid", l.Error(err))
+		return nil, status.Error(codes.Internal, "failed generate uuid")
+	}
+	req.Id = id.String()
+
 	task, err := s.storage.Task().Create(*req)
 	if err != nil {
 		s.logger.Error("failed to create task", l.Error(err))
@@ -79,12 +90,11 @@ func (s *TaskService) Delete(ctx context.Context, req *pb.ByIdReq) (*pb.EmptyRes
 }
 
 func (s *TaskService) ListOverdue(ctx context.Context, req *pb.ListOverReq) (*pb.ListOverResp, error) {
-	//t, err := time.Parse("2006-06-02", req.Time)
-	//if err != nil {
-	//	s.logger.Error("failed to delete task", l.Error(err))
-	//}
-
-	tasks, count, err := s.storage.Task().ListOverdue(req.Page, req.Limit, req.Time)
+	t, err := time.Parse("2006-01-02", req.Time)
+	if err != nil {
+		s.logger.Error("failed to delete task", l.Error(err))
+	}
+	tasks, count, err := s.storage.Task().ListOverdue(req.Page, req.Limit, t)
 	if err != nil {
 		s.logger.Error("failed to list tasks", l.Error(err))
 		return nil, status.Error(codes.Internal, "failed to list tasks")
