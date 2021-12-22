@@ -1,11 +1,11 @@
 package postgres
 
 import (
+	pb "github.com/Yusuf1999-hub/to-do-service/genproto"
 	"log"
 	"reflect"
 	"testing"
-
-	pb "github.com/Yusuf1999-hub/to-do-service/genproto"
+	"time"
 )
 
 func TestTaskRepo_Create(t *testing.T) {
@@ -17,6 +17,7 @@ func TestTaskRepo_Create(t *testing.T) {
 		{
 			name: "omadli",
 			input: pb.Task{
+				Id:       "123e4567-e89b-12d3-a456-426614174000",
 				Assignee: "salom",
 				Title:    "salom of Tashkent",
 				Summary:  "The book is very good",
@@ -24,16 +25,20 @@ func TestTaskRepo_Create(t *testing.T) {
 				Status:   "active",
 			},
 			want: pb.Task{
-				Assignee: "salom",
-				Title:    "salom of Tashkent",
-				Summary:  "The book is very good",
-				Deadline: "2020-11-13T00:00:00Z",
-				Status:   "active",
+				Id:        "123e4567-e89b-12d3-a456-426614174000",
+				Assignee:  "salom",
+				Title:     "salom of Tashkent",
+				Summary:   "The book is very good",
+				Deadline:  "2020-11-13T00:00:00Z",
+				Status:    "active",
+				CreatedAt: "",
+				UpdatedAt: "",
 			},
 		},
 		{
 			name: "additional",
 			input: pb.Task{
+				Id:       "00000000-0000-0000-0000-000000000002",
 				Assignee: "Russia",
 				Title:    "History of Russia",
 				Summary:  "The book is good",
@@ -41,11 +46,14 @@ func TestTaskRepo_Create(t *testing.T) {
 				Status:   "active",
 			},
 			want: pb.Task{
-				Assignee: "Russia",
-				Title:    "History of Russia",
-				Summary:  "The book is good",
-				Deadline: "2020-11-13T00:00:00Z",
-				Status:   "active",
+				Id:        "00000000-0000-0000-0000-000000000002",
+				Assignee:  "Russia",
+				Title:     "History of Russia",
+				Summary:   "The book is good",
+				Deadline:  "2020-11-13T00:00:00Z",
+				Status:    "active",
+				CreatedAt: "",
+				UpdatedAt: "",
 			},
 		},
 	}
@@ -56,7 +64,8 @@ func TestTaskRepo_Create(t *testing.T) {
 			if err != nil {
 				log.Fatalf("%s: got: %v", tc.name, err)
 			}
-			got.Id = 0
+			tc.want.CreatedAt = got.CreatedAt
+			tc.want.UpdatedAt = got.UpdatedAt
 
 			if !reflect.DeepEqual(tc.want, got) {
 				t.Fatalf("%s: expected: %v, got: %v", tc.name, tc.want, got)
@@ -65,15 +74,15 @@ func TestTaskRepo_Create(t *testing.T) {
 	}
 }
 
-func TestTaskRepo_Get(t *testing.T) {
+/*func TestTaskRepo_Get(t *testing.T) {
 	tests := []struct {
 		name string
-		id   int64
+		id   string
 		want pb.Task
 	}{
 		{
 			name: "successful",
-			id:   4,
+			id:   "00000000-0000-0000-0000-000000000004",
 			want: pb.Task{
 				Assignee: "Russia",
 				Title:    "History of Russia",
@@ -84,7 +93,7 @@ func TestTaskRepo_Get(t *testing.T) {
 		},
 		{
 			name: "additional",
-			id:   3,
+			id:   "00000000-0000-0000-0000-000000000003",
 			want: pb.Task{
 				Assignee: "salom",
 				Title:    "salom of Tashkent",
@@ -109,7 +118,7 @@ func TestTaskRepo_Get(t *testing.T) {
 			}
 		})
 	}
-}
+}*/
 
 type result struct {
 	list  []pb.Task
@@ -130,18 +139,18 @@ func TestTaskRepo_List(t *testing.T) {
 			want: result{
 				list: []pb.Task{
 					{
-						Id:       3,
-						Assignee: "Belgium",
-						Title:    "History of Moscow",
-						Summary:  "The book is good",
-						Deadline: "2021-12-13T00:00:00Z",
+						Id:       "00000000-0000-0000-0000-000000000001",
+						Assignee: "salom",
+						Title:    "salom of Tashkent",
+						Summary:  "The book is very good",
+						Deadline: "2020-11-13T00:00:00Z",
 						Status:   "active",
 					},
 					{
-						Id:       4,
-						Assignee: "Russia",
-						Title:    "History of Russia",
-						Summary:  "The book is good",
+						Id:       "00000000-0000-0000-0000-000000000001",
+						Assignee: "salom",
+						Title:    "salom of Tashkent",
+						Summary:  "The book is very good",
 						Deadline: "2020-11-13T00:00:00Z",
 						Status:   "active",
 					},
@@ -173,15 +182,11 @@ func TestTaskRepo_List(t *testing.T) {
 func TestTaskRepo_Delete(t *testing.T) {
 	tests := []struct {
 		name string
-		id   int64
+		id   string
 	}{
 		{
 			name: "birinchi",
-			id:   1,
-		},
-		{
-			name: "ikkinchi",
-			id:   2,
+			id:   "00000000-0000-0000-0000-000000000002",
 		},
 	}
 
@@ -203,7 +208,7 @@ func TestTaskRepo_Update(t *testing.T) {
 		{
 			name: "hullas",
 			input: pb.Task{
-				Id:       3,
+				Id:       "123e4567-e89b-12d3-a456-426614174000",
 				Assignee: "Belgium",
 				Title:    "History of Moscow",
 				Summary:  "The book is good",
@@ -219,6 +224,8 @@ func TestTaskRepo_Update(t *testing.T) {
 			if err != nil {
 				log.Fatalf("%s: got:%v", tc.name, err)
 			}
+			tc.input.CreatedAt = got.CreatedAt
+			tc.input.UpdatedAt = got.UpdatedAt
 
 			if !reflect.DeepEqual(got, tc.input) {
 				log.Fatalf("%s: excepted: %v got: %v", tc.name, tc.input, got)
@@ -228,43 +235,52 @@ func TestTaskRepo_Update(t *testing.T) {
 }
 
 func TestTaskRepo_ListOverdue(t *testing.T) {
-	tests := []struct {
+	timer, _ := time.Parse("2006-01-02", "2021-12-31")
+	var tests = []struct {
 		name  string
 		page  int64
 		limit int64
-		time  string
+		time  time.Time
 		want  result
 	}{
 		{
-			name:  "succcess",
+			name:  "success",
 			page:  1,
-			limit: 1,
-			time:  "2020-12-13",
+			limit: 2,
+			time:  timer,
 			want: result{
 				list: []pb.Task{
 					{
-						Id:       4,
-						Assignee: "Russia",
-						Title:    "History of Russia",
-						Summary:  "The book is good",
-						Deadline: "2020-11-13T00:00:00Z",
-						Status:   "active",
+						Id:        "123e4567-e89b-12d3-a456-426614174000",
+						Assignee:  "Belgium",
+						Title:     "History of Moscow",
+						Summary:   "The book is good",
+						Status:    "active",
+						CreatedAt: "",
+					},
+					{
+						Id:        "d1672aa7-06ae-46fe-b26d-b1292fe6c4f6",
+						Assignee:  "Russia",
+						Title:     "History of Belgium",
+						Summary:   "The book is nimadur",
+						Status:    "active",
+						CreatedAt: "",
 					},
 				},
-				count: 1,
+				count: 2,
 			},
 		},
 	}
-
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+
 			got, count, err := pgRepo.ListOverdue(tc.page, tc.limit, tc.time)
 			if err != nil {
 				log.Fatalf("%s: got:%v", tc.name, err)
 			}
 			if count == tc.want.count {
 				for i, j := range tc.want.list {
-					if j.Assignee != got[i].Assignee || j.Title != got[i].Title || j.Summary != got[i].Summary || j.Deadline != got[i].Deadline || j.Status != got[i].Status {
+					if j.Assignee != got[i].Assignee || j.Title != got[i].Title || j.Summary != got[i].Summary || j.Status != got[i].Status {
 						log.Fatalf("%s: expected:%v got:%v", tc.name, tc.want.list, got)
 					}
 				}
