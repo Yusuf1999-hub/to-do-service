@@ -3,6 +3,7 @@ module github.com/Yusuf1999-hub/to-do-service
 go 1.17
 
 require (
+	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/golang/protobuf v1.5.2
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/lib/pq v1.10.4
