@@ -3,11 +3,11 @@ package service
 import (
 	"context"
 	"fmt"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"time"
 
 	"github.com/gofrs/uuid"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	pb "github.com/Yusuf1999-hub/to-do-service/genproto"
 	l "github.com/Yusuf1999-hub/to-do-service/pkg/logger"

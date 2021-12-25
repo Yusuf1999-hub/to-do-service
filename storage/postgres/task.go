@@ -19,7 +19,6 @@ func NewTaskRepo(db *sqlx.DB) *taskRepo {
 }
 
 func (r *taskRepo) Create(task pb.Task) (pb.Task, error) {
-
 	err := r.db.QueryRow(`
 		INSERT INTO tasks(id, assignee, title, summary, deadline, status, created_at, updated_at)
 		VALUES($1, $2, $3, $4, $5, $6, $7, $8) returning id`,
@@ -129,7 +128,6 @@ func (r *taskRepo) Delete(id string) error {
 }
 
 func (r *taskRepo) ListOverdue(page, limit int64, timer time.Time) ([]*pb.Task, int64, error) {
-
 	var (
 		count int64
 		tasks []*pb.Task

@@ -1,11 +1,12 @@
 package postgres
 
 import (
-	pb "github.com/Yusuf1999-hub/to-do-service/genproto"
 	"log"
 	"reflect"
 	"testing"
 	"time"
+
+	pb "github.com/Yusuf1999-hub/to-do-service/genproto"
 )
 
 func TestTaskRepo_Create(t *testing.T) {
@@ -273,7 +274,6 @@ func TestTaskRepo_ListOverdue(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-
 			got, count, err := pgRepo.ListOverdue(tc.page, tc.limit, tc.time)
 			if err != nil {
 				log.Fatalf("%s: got:%v", tc.name, err)
